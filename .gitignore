@@ -1,0 +1,12 @@
+# Private environment settings
+.env
+**/.env
+
+# Node.js dependencies
+**/node_modules/
+
+# Build output
+**/target/
+
+# Logs
+*.log

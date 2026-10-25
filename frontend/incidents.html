@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Logs | Cybersecurity Incident Tracker</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+        .filter-item {
+            flex: 1;
+            min-width: 180px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <span class="shield-icon">🛡️</span>
+            <span>IncidentTracker</span>
+        </a>
+        <div class="nav-right-container">
+            <ul class="nav-links">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="report.html">Report Incident</a></li>
+                <li><a href="incidents.html" class="active">Incident Logs</a></li>
+            </ul>
+            <div class="soc-status-badge">
+                <span class="pulse-dot"></span>
+                <span>SOC ACTIVE</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <h1>Incident Management Logs</h1>
+                <p>Track, filter, and transition the operational status of all registered security incidents</p>
+            </div>
+            <div>
+                <a href="report.html" class="btn btn-primary">+ Report Incident</a>
+            </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="filter-bar">
+            <div class="filter-item" style="flex: 2;">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by code, title, system, or reporter...">
+            </div>
+            <div class="filter-item">
+                <select id="filterSeverity" class="form-control">
+                    <option value="">All Severities</option>
+                    <option value="CRITICAL">Critical</option>
+                    <option value="HIGH">High</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <select id="filterStatus" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="REPORTED">Reported</option>
+                    <option value="UNDER_INVESTIGATION">Under Investigation</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="RESOLVED">Resolved</option>
+                    <option value="CLOSED">Closed</option>
+                </select>
+            </div>
+            <div>
+                <button id="resetFiltersBtn" class="btn btn-outline" style="height: 100%;">Reset</button>
+            </div>
+        </div>
+
+        <!-- Alert Notification Box -->
+        <div id="tableAlert" style="display: none; padding: 0.85rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;"></div>
+
+        <!-- Incidents Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Title & Description</th>
+                        <th>Type</th>
+                        <th>Severity</th>
+                        <th>Affected System</th>
+                        <th>Reporter</th>
+                        <th>Date</th>
+                        <th>Current Status</th>
+                        <th>Update Status</th>
+                    </tr>
+                </thead>
+                <tbody id="incidentsTableBody">
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                            Loading incidents from database...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>Cybersecurity Incident Reporting and Response Tracker | College PBL Project</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/incidents.js"></script>
+</body>
+</html>

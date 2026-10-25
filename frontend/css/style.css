@@ -1,0 +1,651 @@
+/* =====================================================================
+   Cybersecurity Incident Tracker - Tactical Enterprise SOC Theme
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Base Obsidian Canvas */
+    --bg-dark: #070b14;
+    --bg-card: rgba(15, 23, 42, 0.75);
+    --bg-card-hover: rgba(30, 41, 59, 0.85);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(6, 182, 212, 0.35);
+
+    /* Text Palette */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* High-Tech Cyber Accents */
+    --accent-cyan: #06b6d4;
+    --accent-cyan-glow: rgba(6, 182, 212, 0.3);
+    --accent-blue: #3b82f6;
+    --accent-indigo: #6366f1;
+
+    /* Threat Severity Matrix */
+    --sev-low: #10b981;
+    --sev-medium: #f59e0b;
+    --sev-high: #f97316;
+    --sev-critical: #ef4444;
+
+    /* Status Workflow Colors */
+    --status-reported: #38bdf8;
+    --status-investigating: #fbbf24;
+    --status-inprogress: #a855f7;
+    --status-resolved: #10b981;
+    --status-closed: #6b7280;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 10% 12%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 10%, rgba(59, 130, 246, 0.10) 0%, transparent 45%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =====================================================================
+   Navigation Bar (Command Header)
+   ===================================================================== */
+.navbar {
+    background: rgba(11, 17, 30, 0.85);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.9rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+}
+
+.nav-brand .shield-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.6));
+    animation: shield-glow 3s infinite alternate ease-in-out;
+}
+
+@keyframes shield-glow {
+    0% { filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.4)); }
+    100% { filter: drop-shadow(0 0 14px rgba(6, 182, 212, 0.8)); }
+}
+
+.nav-right-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.25rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.nav-links a:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-links a.active {
+    color: #38bdf8;
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.25);
+}
+
+.nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 8px var(--accent-cyan);
+    border-radius: 2px;
+}
+
+/* SOC Monitor Pill */
+.soc-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35rem 0.8rem;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #34d399;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.soc-status-badge .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 10px #10b981;
+    animation: radar-pulse 1.8s infinite;
+}
+
+@keyframes radar-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.35); }
+}
+
+/* =====================================================================
+   Main Layout & Header
+   ===================================================================== */
+.container {
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    flex: 1;
+    width: 100%;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.page-header h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.page-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
+
+/* =====================================================================
+   Button Component
+   ===================================================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 18px rgba(6, 182, 212, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #0891b2 100%);
+    box-shadow: 0 6px 24px rgba(6, 182, 212, 0.55);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    backdrop-filter: blur(8px);
+}
+
+.btn-outline:hover {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: var(--accent-cyan);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+/* =====================================================================
+   Metric / Stat Cards Grid
+   ===================================================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.35rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.6);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-cyan);
+}
+
+.stat-card.critical {
+    border-color: rgba(239, 68, 68, 0.35);
+    box-shadow: 0 0 20px -5px rgba(239, 68, 68, 0.2);
+}
+.stat-card.critical::before { 
+    background: var(--sev-critical); 
+    box-shadow: 0 0 10px var(--sev-critical);
+}
+
+.stat-card.high {
+    border-color: rgba(249, 115, 22, 0.3);
+}
+.stat-card.high::before { 
+    background: var(--sev-high); 
+    box-shadow: 0 0 10px var(--sev-high);
+}
+
+.stat-card.medium {
+    border-color: rgba(245, 158, 11, 0.3);
+}
+.stat-card.medium::before { 
+    background: var(--sev-medium); 
+    box-shadow: 0 0 10px var(--sev-medium);
+}
+
+.stat-card.low {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+.stat-card.low::before { 
+    background: var(--sev-low); 
+    box-shadow: 0 0 10px var(--sev-low);
+}
+
+.stat-card .label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+}
+
+.stat-card .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.35rem;
+    font-weight: 700;
+    margin-top: 0.35rem;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+/* =====================================================================
+   Analytics & Visual Charts Section
+   ===================================================================== */
+.analytics-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: 0.02em;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1.4fr 1.2fr;
+    gap: 1.25rem;
+}
+
+@media (max-width: 1080px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.35rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 320px;
+    transition: all 0.25s ease;
+}
+
+.chart-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(6, 182, 212, 0.12);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.75rem;
+}
+
+.chart-header h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.25);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.chart-body {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-body canvas {
+    max-height: 230px !important;
+    width: 100% !important;
+}
+
+/* =====================================================================
+   Status & Severity Badges
+   ===================================================================== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.28rem 0.7rem;
+    border-radius: 9999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.badge-low { 
+    background: rgba(16, 185, 129, 0.15); 
+    color: #34d399; 
+    border: 1px solid rgba(16, 185, 129, 0.35); 
+}
+
+.badge-medium { 
+    background: rgba(245, 158, 11, 0.15); 
+    color: #fbbf24; 
+    border: 1px solid rgba(245, 158, 11, 0.35); 
+}
+
+.badge-high { 
+    background: rgba(249, 115, 22, 0.15); 
+    color: #fb923c; 
+    border: 1px solid rgba(249, 115, 22, 0.35); 
+}
+
+.badge-critical { 
+    background: rgba(239, 68, 68, 0.18); 
+    color: #f87171; 
+    border: 1px solid rgba(239, 68, 68, 0.45); 
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+}
+
+.badge-critical::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+    animation: radar-pulse 1.4s infinite;
+}
+
+/* Monospace Code & Systems */
+code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(6, 182, 212, 0.1);
+    color: #38bdf8;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    font-size: 0.82rem;
+}
+
+/* =====================================================================
+   Data Tables (SOC Feed Table)
+   ===================================================================== */
+.table-container {
+    background: var(--bg-card);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow-x: auto;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 1rem 1.35rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+th {
+    background: rgba(11, 17, 30, 0.95);
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+}
+
+tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.incident-code-cell {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    letter-spacing: 0.03em;
+}
+
+/* Status select inside table */
+.status-select {
+    padding: 0.4rem 0.75rem;
+    background: rgba(11, 15, 25, 0.9);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-select:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}
+
+/* =====================================================================
+   Form Controls (Report Page)
+   ===================================================================== */
+.form-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 2.25rem;
+    max-width: 840px;
+    margin: 0 auto;
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6);
+}
+
+.form-group {
+    margin-bottom: 1.4rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.01em;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(7, 11, 20, 0.85);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.form-control:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2), 0 0 12px rgba(6, 182, 212, 0.15);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(6, 182, 212, 0.4);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: auto;
+}

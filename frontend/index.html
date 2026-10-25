@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Dashboard | Cybersecurity Incident Tracker</title>
+    <!-- Fonts & Chart Engine -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <span class="shield-icon">🛡️</span>
+            <span>IncidentTracker</span>
+        </a>
+        <div class="nav-right-container">
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Dashboard</a></li>
+                <li><a href="report.html">Report Incident</a></li>
+                <li><a href="incidents.html">Incident Logs</a></li>
+            </ul>
+            <div class="soc-status-badge">
+                <span class="pulse-dot"></span>
+                <span>SOC ACTIVE</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1>Cybersecurity Incident Reporting and Response Tracker</h1>
+                <p>Real-time visibility into organization-wide threats, active vectors, and containment workflows</p>
+            </div>
+            <div>
+                <a href="report.html" class="btn btn-primary">+ Report New Incident</a>
+            </div>
+        </div>
+
+        <!-- Metric KPI Cards (Total & Severity) -->
+        <section>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">Total Incidents</div>
+                    <div class="value" id="totalIncidents">0</div>
+                </div>
+                <div class="stat-card critical">
+                    <div class="label">Critical</div>
+                    <div class="value" id="criticalIncidents" style="color: var(--sev-critical);">0</div>
+                </div>
+                <div class="stat-card high">
+                    <div class="label">High</div>
+                    <div class="value" id="highIncidents" style="color: var(--sev-high);">0</div>
+                </div>
+                <div class="stat-card medium">
+                    <div class="label">Medium</div>
+                    <div class="value" id="mediumIncidents" style="color: var(--sev-medium);">0</div>
+                </div>
+                <div class="stat-card low">
+                    <div class="label">Low</div>
+                    <div class="value" id="lowIncidents" style="color: var(--sev-low);">0</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SOC Real-Time Analytics & Visual Graphs Section -->
+        <section class="analytics-section">
+            <h2 class="section-title">
+                <span style="color: var(--accent-cyan);">⚡</span> Operational Threat Intelligence & Analytics
+            </h2>
+            <div class="analytics-grid">
+                
+                <!-- Chart 1: Severity Donut -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Threat Severity Matrix</h3>
+                        <span class="chart-tag">PROPORTION</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Threat Velocity Curve -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>7-Day Threat Velocity</h3>
+                        <span class="chart-tag">ACTIVITY TREND</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="velocityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Top Attack Vectors Horizontal Bars -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Top Attack Vectors</h3>
+                        <span class="chart-tag">BY CATEGORY</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="attackVectorChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Quick Action & Recent Incidents Section -->
+        <section style="margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h2 class="section-title" style="margin-bottom: 0;">
+                    <span style="color: var(--accent-blue);">📋</span> Recent Incidents Overview
+                </h2>
+                <a href="incidents.html" class="btn btn-outline" style="font-size: 0.82rem;">View Full Incident Logs &rarr;</a>
+            </div>
+            <div class="table-container">
+                <table id="recentIncidentsTable">
+                    <thead>
+                        <tr>
+                            <th>Incident Code</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Affected System</th>
+                            <th>Detection Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentIncidentsBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem; font-family: 'JetBrains Mono', monospace;">
+                                Connecting to backend SOC API...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>Cybersecurity Incident Reporting and Response Tracker | Enterprise SOC Dashboard</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
