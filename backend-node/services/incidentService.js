@@ -1,4 +1,4 @@
-const { pool } = require('../config/DB');
+const { pool } = require('../config/db');
 
 const findAll = async (filters = {}) => {
     let query = 'SELECT * FROM incidents WHERE 1=1';
