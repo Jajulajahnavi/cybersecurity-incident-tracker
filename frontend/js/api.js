@@ -1,7 +1,7 @@
 /**
  * Centralized API service for the Node.js Express backend.
  */
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://cybersecurity-incident-tracker-api.onrender.com/api';
 
 const IncidentAPI = {
     async checkHealth() {
