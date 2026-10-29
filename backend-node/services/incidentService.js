@@ -5,40 +5,42 @@ const findAll = async (filters = {}) => {
     const params = [];
 
     if (filters.severity) {
+        query += ' AND severity = ?';
         params.push(filters.severity);
-        query += ` AND severity = $${params.length}`;
     }
 
     if (filters.status) {
+        query += ' AND status = ?';
         params.push(filters.status);
-        query += ` AND status = $${params.length}`;
     }
 
     if (filters.search) {
-        params.push(`%${filters.search}%`);
-        const p = `$${params.length}`;
-        query += ` AND (title ILIKE ${p} OR description ILIKE ${p} OR affected_system ILIKE ${p})`;
+        query += ' AND (title LIKE ? OR description LIKE ? OR affected_system LIKE ?)';
+        const search = `%${filters.search}%`;
+        params.push(search, search, search);
     }
 
     query += ' ORDER BY incident_date DESC';
-    const result = await pool.query(query, params);
-    return result.rows;
+    const [rows] = await pool.query(query, params);
+    return rows;
 };
 
 const getStats = async () => {
-    const totalResult = await pool.query(
-        'SELECT COUNT(*)::int AS total FROM incidents'
+    const [totalRows] = await pool.query(
+        'SELECT COUNT(*) AS total FROM incidents'
     );
-    const severityResult = await pool.query(
-        'SELECT severity, COUNT(*)::int AS count FROM incidents GROUP BY severity'
+
+    const [severityRows] = await pool.query(
+        'SELECT severity, COUNT(*) AS count FROM incidents GROUP BY severity'
     );
-    const statusResult = await pool.query(
-        'SELECT status, COUNT(*)::int AS count FROM incidents GROUP BY status'
+
+    const [statusRows] = await pool.query(
+        'SELECT status, COUNT(*) AS count FROM incidents GROUP BY status'
     );
 
     const bySeverity = { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 };
-    severityResult.rows.forEach(row => {
-        bySeverity[row.severity] = row.count;
+    severityRows.forEach(row => {
+        bySeverity[row.severity] = Number(row.count);
     });
 
     const byStatus = {
@@ -48,12 +50,13 @@ const getStats = async () => {
         RESOLVED: 0,
         CLOSED: 0
     };
-    statusResult.rows.forEach(row => {
-        byStatus[row.status] = row.count;
+
+    statusRows.forEach(row => {
+        byStatus[row.status] = Number(row.count);
     });
 
     return {
-        total: totalResult.rows[0]?.total || 0,
+        total: Number(totalRows[0].total),
         bySeverity,
         byStatus
     };
@@ -65,79 +68,83 @@ const create = async (incident) => {
         affected_system, reported_by, incident_date
     } = incident;
 
-    const client = await pool.connect();
+    const connection = await pool.getConnection();
 
     try {
-        await client.query('BEGIN');
+        await connection.beginTransaction();
 
-        const countResult = await client.query(
-            'SELECT COUNT(*)::int AS count FROM incidents'
+        const [countRows] = await connection.query(
+            'SELECT COUNT(*) AS count FROM incidents'
         );
-        const count = countResult.rows[0].count;
-        const code = `INC-${new Date().getFullYear()}-${String(count + 1).padStart(3, '0')}`;
 
-        const result = await client.query(
+        const code = `INC-${new Date().getFullYear()}-${String(Number(countRows[0].count) + 1).padStart(3, '0')}`;
+
+        const [result] = await connection.query(
             `INSERT INTO incidents
-             (incident_code, title, incident_type, severity, description,
-              affected_system, reported_by, incident_date)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-             RETURNING id, incident_code, title, incident_type, severity,
-                       description, affected_system, reported_by, incident_date, status`,
+            (incident_code, title, incident_type, severity, description,
+             affected_system, reported_by, incident_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 code, title, incident_type, severity, description,
                 affected_system, reported_by, incident_date || new Date()
             ]
         );
 
-        await client.query('COMMIT');
-        return result.rows[0];
+        await connection.commit();
+
+        const [rows] = await connection.query(
+            'SELECT * FROM incidents WHERE id = ?',
+            [result.insertId]
+        );
+
+        return rows[0];
     } catch (error) {
-        await client.query('ROLLBACK');
+        await connection.rollback();
         throw error;
     } finally {
-        client.release();
+        connection.release();
     }
 };
 
 const updateStatus = async (id, newStatus, notes, changedBy = 'Analyst') => {
-    const client = await pool.connect();
+    const connection = await pool.getConnection();
 
     try {
-        await client.query('BEGIN');
+        await connection.beginTransaction();
 
-        const existing = await client.query(
-            'SELECT status FROM incidents WHERE id = $1 FOR UPDATE',
+        const [existing] = await connection.query(
+            'SELECT status FROM incidents WHERE id = ? FOR UPDATE',
             [id]
         );
 
-        if (existing.rows.length === 0) {
+        if (existing.length === 0) {
             throw new Error('Incident not found');
         }
 
-        const oldStatus = existing.rows[0].status;
+        const oldStatus = existing[0].status;
 
-        await client.query(
-            'UPDATE incidents SET status = $1 WHERE id = $2',
+        await connection.query(
+            'UPDATE incidents SET status = ? WHERE id = ?',
             [newStatus, id]
         );
 
-        await client.query(
+        await connection.query(
             `INSERT INTO incident_status_history
-             (incident_id, old_status, new_status, changed_by, change_notes)
-             VALUES ($1, $2, $3, $4, $5)`,
+            (incident_id, old_status, new_status, changed_by, change_notes)
+            VALUES (?, ?, ?, ?, ?)`,
             [
                 id, oldStatus, newStatus, changedBy,
                 notes || `Status changed from ${oldStatus} to ${newStatus}`
             ]
         );
 
-        await client.query('COMMIT');
+        await connection.commit();
         return { success: true, id, oldStatus, newStatus };
     } catch (error) {
-        await client.query('ROLLBACK');
+        await connection.rollback();
         throw error;
     } finally {
-        client.release();
+        connection.release();
     }
 };
 

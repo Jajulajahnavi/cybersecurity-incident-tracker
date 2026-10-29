@@ -1,43 +1,38 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
-const dotenv = require('dotenv');
-const { testConnection } = require('./config/db');
+const cors = require('cors');
+require('dotenv').config();
 
-// Load environment configuration
-dotenv.config();
+const { testConnection } = require('./config/db');
+const incidentRoutes = require('./routes/incidentRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve frontend static files
-app.use(express.static(path.join(__dirname, '../frontend')));
-
-const incidentRoutes = require('./routes/incidentRoutes');
-
-// API Routes
+// API routes
 app.use('/api/incidents', incidentRoutes);
 
-// Health Check API Route
-app.get('/api/health', async (req, res) => {
-    res.json({
-        status: 'UP',
-        service: 'Cybersecurity Incident Tracker API',
-        timestamp: new Date().toISOString()
-    });
+// Serve the frontend
+const frontendPath = path.join(__dirname, '../frontend');
+app.use(express.static(frontendPath));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// Start Server
+// Health check
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'UP', message: 'Incident Tracker API is running' });
+});
+
+// Start server
 app.listen(PORT, async () => {
-    console.log(`====================================================`);
-    console.log(`🚀 Incident Tracker API running on http://localhost:${PORT}`);
-    console.log(`🌐 Serving frontend at http://localhost:${PORT}`);
-    console.log(`====================================================`);
-    // Verify database connection on startup
+    console.log(`Incident Tracker API running on port ${PORT}`);
+    console.log('Serving frontend');
+
     await testConnection();
 });
