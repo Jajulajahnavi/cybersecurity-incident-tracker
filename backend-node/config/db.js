@@ -1,4 +1,7 @@
 const mysql = require('mysql2/promise');
+const fs = require('fs');
+const path = require('path');
+
 require('dotenv').config();
 
 const isCloud = Boolean(process.env.DB_HOST);
@@ -10,7 +13,15 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME || 'incident_tracker_db',
     port: Number(process.env.DB_PORT || 3306),
 
-    ssl: isCloud ? { rejectUnauthorized: true } : undefined,
+    ssl: isCloud
+        ? {
+            ca: fs.readFileSync(
+                path.join(__dirname, 'ca.pem'),
+                'utf8'
+            ),
+            rejectUnauthorized: true
+        }
+        : undefined,
 
     waitForConnections: true,
     connectionLimit: 10,
@@ -18,15 +29,23 @@ const pool = mysql.createPool({
 });
 
 async function testConnection() {
+    let connection;
+
     try {
-        const connection = await pool.getConnection();
+        connection = await pool.getConnection();
         console.log('Successfully connected to MySQL');
-        connection.release();
         return true;
     } catch (error) {
         console.error('MySQL connection failed:', error);
         return false;
+    } finally {
+        if (connection) {
+            connection.release();
+        }
     }
 }
 
-module.exports = { pool, testConnection };
+module.exports = {
+    pool,
+    testConnection
+};
